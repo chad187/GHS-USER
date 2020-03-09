@@ -14,6 +14,7 @@ export const ALL_COLLECTIONS = [
   SCHOOLS_COLLECTION,
   USERS_COLLECTION,
 ];
-
-export const API_HOST = 'localhost:8080';
+// TO DO get production url for ghs api
+export const API_HOST =
+  process.env.NODE_ENV === 'production' ? '' : 'localhost:4040';
 export const PROTOCOL = 'http';

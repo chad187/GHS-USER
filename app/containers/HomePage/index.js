@@ -13,12 +13,22 @@ import { connect } from 'react-redux';
 
 import messages from './messages';
 
-import { DISTRICTS_COLLECTION, GET_ALL } from '../../constants/api';
+import { DISTRICTS_COLLECTION, GET_ALL, GET_ONE } from '../../constants/api';
 import { getEndpointActionsForCollection } from '../../redux/actions/api';
 import { getIsCollectionEndpointLoading } from '../../redux/selectors/api';
+import {
+  getDistricts,
+  getDistrict,
+  getDistrictListLength,
+} from '../../redux/selectors/districts';
 
 // eslint-disable-next-line react/prop-types
-export const HomePage = ({ isLoading, getAllDistricts }) => {
+export const HomePage = ({
+  isLoading,
+  getAllDistricts,
+  getOneDistrict,
+  district,
+}) => {
   // eslint-disable-next-line no-unused-vars
   const [limit, setLimit] = React.useState(10);
   // eslint-disable-next-line no-unused-vars
@@ -28,14 +38,18 @@ export const HomePage = ({ isLoading, getAllDistricts }) => {
   React.useEffect(() => {
     // Only make a new call if the endpoint is not already being queried
     if (!isLoading) {
+      // Fetch one district
+      getOneDistrict({ id: '5e63fb46269ebe0990b29a5b' });
       // Fetch the specified "page" of districts from the server
       getAllDistricts({ limit, skip: page * limit });
+      // <ul>{.map(el => <li key={el.id}>{el.title}</li>)}</ul>;
     }
   }, [page, limit]);
 
   return (
     <h1>
       <FormattedMessage {...messages.header} />
+      {district && district._id}
     </h1>
   );
 };
@@ -47,14 +61,22 @@ const isLoadingSelector = getIsCollectionEndpointLoading(
 );
 const mapStateToProps = state => ({
   isLoading: isLoadingSelector(state),
+  districts: getDistricts(state),
+  district: getDistrict(state, '5e63fb46269ebe0990b29a5b'),
+  numDistrict: getDistrictListLength(state),
 });
 
-// Get the "fetch" action for the "gat all" behavior on the districts collection
+// Get the "fetch" action for the "get all" behavior on the districts collection
 const { fetch } = getEndpointActionsForCollection(DISTRICTS_COLLECTION)[
   GET_ALL
 ];
+const { fetch: fetchOne } = getEndpointActionsForCollection(
+  DISTRICTS_COLLECTION,
+)[GET_ONE];
+
 const mapDispatchToProps = {
   getAllDistricts: fetch,
+  getOneDistrict: fetchOne,
 };
 
 const hoc = compose(
